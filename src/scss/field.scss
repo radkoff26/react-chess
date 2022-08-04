@@ -1,0 +1,36 @@
+.field {
+  display: grid;
+  height: 800px;
+  width: 800px;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 0;
+  border: 1px solid #713b00;
+  filter: drop-shadow(20px 20px 20px #713b00);
+
+  .cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    width: 100px;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+
+    img {
+      height: 70%;
+      width: 70%;
+    }
+  }
+}
+
+.black {
+  background-color: #713b00;
+}
+
+.white {
+  background-color: #fff;
+}
+
+.step {
+  background-color: rgba(0, 255, 0, 0.5);
+}
