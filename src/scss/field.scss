@@ -1,19 +1,45 @@
 .field {
   display: grid;
-  height: 800px;
-  width: 800px;
+  height: 70vh;
+  width: 70vh;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
   gap: 0;
   border: 1px solid #713b00;
   filter: drop-shadow(20px 20px 20px #713b00);
+  position: relative;
+
+  h1 {
+    position: absolute;
+    width: 200px;
+    color: #007fd0;
+    background-color: #a71d1d;
+    left: calc(50% - 100px);
+    text-align: center;
+  }
+
+  h1.game_over {
+    padding: 0 8px;
+    top: 40%;
+  }
+
+  h1.step {
+    line-height: 40px;
+    font-size: 24px;
+    top: -81px;
+  }
+
+  h1.shah {
+    line-height: 36px;
+    font-size: 24px;
+    color: #00ff34;
+    top: 100%;
+  }
 
   .cell {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100px;
-    width: 100px;
     border: 1px solid rgba(0, 0, 0, 0.5);
 
     img {

@@ -8,7 +8,7 @@ import {
     checkBounds,
     checkBoundsAndEmptiness,
     checkBoundsAndEmptinessAndEnemy,
-    checkBoundsAndEnemy
+    checkBoundsAndEnemy, includes
 } from "../helpers/function_helpers";
 import {Bishop} from "../models/figures/bishop";
 import {Queen} from "../models/figures/queen";
@@ -17,6 +17,10 @@ import {King} from "../models/figures/king";
 export interface Coords {
     x: number
     y: number
+}
+
+export function findDirection(color: string): Direction {
+    return color === 'W' ? Direction.DOWN : Direction.UP;
 }
 
 function calculateRook(field: Figure[][], i: number, j: number, steps: Coords[]) {
@@ -95,6 +99,42 @@ function calculateBishop(field: Figure[][], i: number, j: number, steps: Coords[
         }
         steps.push({x: k, y: l})
     }
+}
+
+export function checkIfKingIsSafe(field: Figure[][], color: string): boolean {
+    const kingSignature = color + 'K';
+
+    let i: number = -1, j: number = -1
+
+    for (let k = 0; k < 8; k++) {
+        for (let l = 0; l < 8; l++) {
+            if (field[k][l].signature === kingSignature) {
+                i = k
+                j = l
+                break
+            }
+        }
+    }
+
+    const enemyColor = color === 'W' ? 'B' : 'W'
+    const possibleStepsOfEnemies: Set<Coords> = new Set<Coords>()
+
+    let temp: Coords[]
+
+    for (let k = 0; k < 8; k++) {
+        for (let l = 0; l < 8; l++) {
+            if (field[k][l].color === enemyColor) {
+                temp = calculateSteps(field, k, l, findDirection(enemyColor))
+                for (let c of temp) {
+                    possibleStepsOfEnemies.add(c)
+                }
+            }
+        }
+    }
+
+    const array = Array.from(possibleStepsOfEnemies)
+
+    return !includes({x: i, y: j}, array);
 }
 
 export function calculateSteps(field: Figure[][], i: number, j: number, direction: Direction): Coords[] {
