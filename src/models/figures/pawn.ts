@@ -8,5 +8,4 @@ export class Pawn implements Figure {
         this.color = color;
         this.signature = color + 'P'
     }
-
 }

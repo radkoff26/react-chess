@@ -14,6 +14,7 @@ import {Bishop} from "../models/figures/bishop";
 import {Queen} from "../models/figures/queen";
 import {King} from "../models/figures/king";
 
+// Interface to store coordinates of some cell
 export interface Coords {
     x: number
     y: number
@@ -23,7 +24,9 @@ export function findDirection(color: string): Direction {
     return color === 'W' ? Direction.DOWN : Direction.UP;
 }
 
+// Function to calculate possible steps for Rook
 function calculateRook(field: Figure[][], i: number, j: number, steps: Coords[]) {
+    // Vertical down check
     for (let k = i + 1; k < 8; k++) {
         if (!(field[k][j] instanceof Empty)) {
             if (field[k][j].color !== field[i][j].color) {
@@ -33,6 +36,8 @@ function calculateRook(field: Figure[][], i: number, j: number, steps: Coords[])
         }
         steps.push({x: k, y: j})
     }
+
+    // Vertical up check
     for (let k = i - 1; k >= 0; k--) {
         if (!(field[k][j] instanceof Empty)) {
             if (field[k][j].color !== field[i][j].color) {
@@ -42,6 +47,8 @@ function calculateRook(field: Figure[][], i: number, j: number, steps: Coords[])
         }
         steps.push({x: k, y: j})
     }
+
+    // Horizontal right check
     for (let k = j + 1; k < 8; k++) {
         if (!(field[i][k] instanceof Empty)) {
             if (field[i][k].color !== field[i][j].color) {
@@ -51,6 +58,8 @@ function calculateRook(field: Figure[][], i: number, j: number, steps: Coords[])
         }
         steps.push({x: i, y: k})
     }
+
+    // Horizontal left check
     for (let k = j - 1; k >= 0; k--) {
         if (!(field[i][k] instanceof Empty)) {
             if (field[i][k].color !== field[i][j].color) {
@@ -62,7 +71,9 @@ function calculateRook(field: Figure[][], i: number, j: number, steps: Coords[])
     }
 }
 
+// Function to calculate steps for Bishop
 function calculateBishop(field: Figure[][], i: number, j: number, steps: Coords[]) {
+    // Diagonal to right bottom
     for (let k = i + 1, l = j + 1; k < 8 && l < 8; k++, l++) {
         if (!(field[k][l] instanceof Empty)) {
             if (field[k][l].color !== field[i][j].color) {
@@ -72,6 +83,8 @@ function calculateBishop(field: Figure[][], i: number, j: number, steps: Coords[
         }
         steps.push({x: k, y: l})
     }
+
+    // Diagonal to right top
     for (let k = i - 1, l = j + 1; k >= 0 && l < 8; k--, l++) {
         if (!(field[k][l] instanceof Empty)) {
             if (field[k][l].color !== field[i][j].color) {
@@ -81,6 +94,8 @@ function calculateBishop(field: Figure[][], i: number, j: number, steps: Coords[
         }
         steps.push({x: k, y: l})
     }
+
+    // Diagonal to left bottom
     for (let k = i + 1, l = j - 1; k < 8 && l >= 0; k++, l--) {
         if (!(field[k][l] instanceof Empty)) {
             if (field[k][l].color !== field[i][j].color) {
@@ -90,6 +105,8 @@ function calculateBishop(field: Figure[][], i: number, j: number, steps: Coords[
         }
         steps.push({x: k, y: l})
     }
+
+    // Diagonal to left top
     for (let k = i - 1, l = j - 1; k >= 0 && l >= 0; k--, l--) {
         if (!(field[k][l] instanceof Empty)) {
             if (field[k][l].color !== field[i][j].color) {
@@ -101,11 +118,13 @@ function calculateBishop(field: Figure[][], i: number, j: number, steps: Coords[
     }
 }
 
+// Function to check if the king is not under a shah (safe)
 export function checkIfKingIsSafe(field: Figure[][], color: string): boolean {
     const kingSignature = color + 'K';
 
     let i: number = -1, j: number = -1
 
+    // Here certain king is found
     for (let k = 0; k < 8; k++) {
         for (let l = 0; l < 8; l++) {
             if (field[k][l].signature === kingSignature) {
@@ -121,6 +140,7 @@ export function checkIfKingIsSafe(field: Figure[][], color: string): boolean {
 
     let temp: Coords[]
 
+    // Calculate all possible steps of enemies
     for (let k = 0; k < 8; k++) {
         for (let l = 0; l < 8; l++) {
             if (field[k][l].color === enemyColor) {
@@ -134,6 +154,8 @@ export function checkIfKingIsSafe(field: Figure[][], color: string): boolean {
 
     const array = Array.from(possibleStepsOfEnemies)
 
+    // It returns true if the king's coords are in the array of all possible steps of enemies
+    // Consequently, it means that the king is under a shah (not safe)
     return !includes({x: i, y: j}, array);
 }
 

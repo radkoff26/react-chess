@@ -1,6 +1,6 @@
 import {Figure} from "./figure";
 
-export class King implements Figure{
+export class King implements Figure {
     color: string;
     signature: string;
 
