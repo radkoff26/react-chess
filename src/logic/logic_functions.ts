@@ -177,28 +177,28 @@ export function calculateSteps(field: Figure[][], i: number, j: number, directio
     }
     // KING LOGIC
     else if (figure instanceof King) {
-        if (checkBoundsAndEnemy(field, i - 1, j + 1, figure.color)) {
+        if (checkBoundsAndEmptinessAndEnemy(field, i - 1, j + 1, figure.color)) {
             steps.push({x: i - 1, y: j + 1})
         }
-        if (checkBoundsAndEnemy(field, i + 1, j + 1, figure.color)) {
+        if (checkBoundsAndEmptinessAndEnemy(field, i + 1, j + 1, figure.color)) {
             steps.push({x: i + 1, y: j + 1})
         }
-        if (checkBoundsAndEnemy(field, i + 1, j - 1, figure.color)) {
+        if (checkBoundsAndEmptinessAndEnemy(field, i + 1, j - 1, figure.color)) {
             steps.push({x: i + 1, y: j - 1})
         }
-        if (checkBoundsAndEnemy(field, i - 1, j - 1, figure.color)) {
+        if (checkBoundsAndEmptinessAndEnemy(field, i - 1, j - 1, figure.color)) {
             steps.push({x: i - 1, y: j - 1})
         }
-        if (checkBoundsAndEnemy(field, i, j + 1, figure.color)) {
+        if (checkBoundsAndEmptinessAndEnemy(field, i, j + 1, figure.color)) {
             steps.push({x: i, y: j + 1})
         }
-        if (checkBoundsAndEnemy(field, i, j - 1, figure.color)) {
+        if (checkBoundsAndEmptinessAndEnemy(field, i, j - 1, figure.color)) {
             steps.push({x: i, y: j - 1})
         }
-        if (checkBoundsAndEnemy(field, i + 1, j, figure.color)) {
+        if (checkBoundsAndEmptinessAndEnemy(field, i + 1, j, figure.color)) {
             steps.push({x: i + 1, y: j})
         }
-        if (checkBoundsAndEnemy(field, i - 1, j, figure.color)) {
+        if (checkBoundsAndEmptinessAndEnemy(field, i - 1, j, figure.color)) {
             steps.push({x: i - 1, y: j})
         }
     }

@@ -1,12 +1,17 @@
 import React from 'react';
-import Field from "../components/Field";
+import {Provider} from 'react-redux';
+import {createStore} from 'redux';
+import {ConnectedField} from "../components/Field";
 import '../scss/main.scss';
+import {rootReducer} from "../store/reducers";
+
+const store = createStore(rootReducer)
 
 const MainPage = () => {
     return (
-        <>
-            <Field/>
-        </>
+        <Provider store={store}>
+            <ConnectedField/>
+        </Provider>
     );
 };
 

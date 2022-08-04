@@ -1,85 +1,67 @@
-import React, {useState} from 'react';
+import React from 'react';
 import Cell, {CellProps} from "./Cell";
 import {Figure} from "../models/figures/figure";
 import {SIGNATURES_TO_OBJECTS} from "../models/definitions";
 import '../scss/field.scss'
-import {calculateSteps, Coords} from "../logic/logic_functions";
-import {Direction} from "../helpers/enums";
-import {getInitialField} from "../helpers/adjusting_functions";
-import {Empty} from "../models/figures/empty";
-import {Pawn} from "../models/figures/pawn";
+import {Coords} from "../logic/logic_functions";
 import {includes} from "../helpers/function_helpers";
+import {connect, ConnectedProps} from "react-redux";
+import {Dispatch} from "redux";
+import {FieldAction} from "../store/actions";
 
-const Field = () => {
-    const [field, setField] = useState<Figure[][]>(getInitialField('W', 'B'))
-    const [steps, setSteps] = useState<Coords[]>([])
-    const [pickedFigureCoords, setPickedFigureCoords] = useState<Coords>({x: -1, y: -1})
+export interface FieldState {
+    field: Figure[][]
+    steps: Coords[]
+    pickedFigureCoords: Coords
+}
 
-    const chooseFigure = (i: number, j: number) => {
-        setPickedFigureCoords({x: i, y: j})
-        setSteps(calculateSteps(field, i, j, Direction.UP))
-    }
+const mapState = (state: FieldState): FieldState => (state)
+const mapDispatch = (dispatch: Dispatch) => ({
+    chooseFigure: (i: number, j: number): FieldAction => dispatch({type: 'CHOOSE_FIGURE', payload: {i, j}}),
+    makeStep: (i: number, j: number): FieldAction => dispatch({type: 'MAKE_STEP', payload: {i, j}})
+})
 
-    const toSwap = (field: Figure[][], i1: number, j1: number, i2: number, j2: number) => {
-        let temp: Figure = field[i1][j1]
-        field[i1][j1] = field[i2][j2];
-        field[i2][j2] = temp;
-        setField(field)
-    }
+const connector = connect(mapState, mapDispatch);
 
-    const toBeat = (field: Figure[][], i1: number, j1: number, i2: number, j2: number) => {
-        field[i1][j1] = field[i2][j2];
-        field[i2][j2] = new Empty();
-        setField(field)
-    }
+type FieldProps = ConnectedProps<typeof connector>
 
-    const makeStep = (i: number, j: number) => {
-        if (includes({x: i, y: j}, steps) && pickedFigureCoords) {
-            if (!(field[i][j] instanceof Empty)) {
-                toBeat(field, i, j, pickedFigureCoords.x, pickedFigureCoords.y)
-            } else {
-                toSwap(field, i, j, pickedFigureCoords.x, pickedFigureCoords.y)
-            }
-            setSteps([])
-        }
-    }
-
+const Field = (props: FieldProps) => {
     return (
         <div className='field'>
-            {field.map((array, i) => {
+            {props.field.map((array, i) => {
                 return array.map((value: Figure, j: number) => {
-                    let props: CellProps = new class implements CellProps {
+                    let data: CellProps = new class implements CellProps {
                         cellColor: string = '';
                         figure: Figure = value;
                         i: number = i;
-                        isPossibleToStep: boolean = includes({x: i, y: j}, steps);
+                        isPossibleToStep: boolean = includes({x: i, y: j}, props.steps);
                         j: number = j;
                         //@ts-ignore
                         url: string = SIGNATURES_TO_OBJECTS[value.signature].url;
 
-                        callbackToChoose(i: number, j: number): void {
-                            chooseFigure(i, j)
+                        chooseFigure(i: number, j: number): FieldAction {
+                            return props.chooseFigure(i, j);
                         }
 
-                        callbackToMakeStep(i: number, j: number): void {
-                            makeStep(i, j)
+                        makeStep(i: number, j: number): FieldAction {
+                            return props.makeStep(i, j);
                         }
                     }
                     if ((j + (i % 2)) % 2 === 0) {
-                        props.cellColor = 'B'
+                        data.cellColor = 'B'
                     } else {
-                        props.cellColor = 'W'
+                        data.cellColor = 'W'
                     }
                     return <Cell
                         key={i + '' + j}
-                        cellColor={props.cellColor}
-                        url={props.url}
-                        figure={props.figure}
-                        isPossibleToStep={props.isPossibleToStep}
-                        i={props.i}
-                        j={props.j}
-                        callbackToChoose={chooseFigure}
-                        callbackToMakeStep={makeStep}
+                        cellColor={data.cellColor}
+                        url={data.url}
+                        figure={data.figure}
+                        isPossibleToStep={data.isPossibleToStep}
+                        i={data.i}
+                        j={data.j}
+                        chooseFigure={data.chooseFigure}
+                        makeStep={data.makeStep}
                     />
                 })
             })}
@@ -87,4 +69,4 @@ const Field = () => {
     );
 };
 
-export default Field;
+export const ConnectedField = connector(Field);
