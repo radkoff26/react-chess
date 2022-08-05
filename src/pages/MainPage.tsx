@@ -1,11 +1,16 @@
 import React from 'react';
 import {Provider} from 'react-redux';
-import {createStore} from 'redux';
+import {combineReducers, createStore} from 'redux';
 import {ConnectedField} from "../components/Field";
 import '../scss/main.scss';
-import {rootReducer} from "../store/reducers";
+import {fieldReducer} from "../store/reducers";
+import {configureStore} from "@reduxjs/toolkit";
 
-const store = createStore(rootReducer)
+const reducers = combineReducers({
+    fieldReducer
+})
+
+const store = createStore(fieldReducer)
 
 const MainPage = () => {
     return (

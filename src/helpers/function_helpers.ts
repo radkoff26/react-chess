@@ -37,3 +37,19 @@ export function includes(coords: Coords, steps: Coords[]): boolean {
     }
     return false;
 }
+
+// Function that converts seconds to minutes and seconds
+export function convertSecondsToMinutesAndSeconds(secondsOverall: number): string {
+    let minutes = Math.floor(secondsOverall / 60)
+    let seconds = secondsOverall % 60
+
+    let stringMinutes = minutes < 10 ? '0' + minutes.toString() : minutes.toString()
+    let stringSeconds = seconds < 10 ? '0' + seconds.toString() : seconds.toString()
+
+    return stringMinutes + ':' + stringSeconds;
+}
+
+// Function that converts Coords object to coordinates of the field
+export function convertCoordsToFieldCoords(coords: Coords): string {
+    return ('ABCDEFGH'.charAt(coords.y)).toString() + '' + (coords.x + 1).toString()
+}
