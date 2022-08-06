@@ -1,32 +1,36 @@
 import {GameState} from "../components/Field";
 import {getInitialField} from "../helpers/adjusting_functions";
 import {calculateSteps, checkIfKingIsSafe, findDirection} from "../logic/logic_functions";
-import {FieldAction, PlayerInfoAction} from "./actions";
+import {CommonAction} from "./actions";
 import {Figure} from "../models/figures/figure";
 import {Empty} from "../models/figures/empty";
 import {includes} from "../helpers/function_helpers";
 import {Reducer} from "redux";
 import {Step} from "../models/step";
-import {CHOOSE_FIGURE, MAKE_STEP, TICK} from "./types";
+import {CHOOSE_FIGURE, LAST_LINE, MAKE_STEP, SURRENDER, TICK} from "./types";
+import {Pawn} from "../models/figures/pawn";
+import {PlayerSide} from "../helpers/enums";
 
-// Initial state for Field Component
+// Initial Game state
 export const initialState: GameState = {
     field: getInitialField('W', 'B'),
     pickedFigureCoords: {x: -1, y: -1},
     steps: [],
-    player: 'W',
+    player: PlayerSide.W,
     isKingSafe: {W: true, B: true},
     isGameOver: false,
     playersInGame: {W: 'Player1', B: 'Player2'},
-    winner: '',
-    timeLeftForW: 5,
-    timeLeftForB: 15,
+    winner: PlayerSide.NOTHING,
+    timeLeftForW: 15 * 60,
+    timeLeftForB: 15 * 60,
     madeStepsW: [],
-    madeStepsB: []
+    madeStepsB: [],
+    lastLinePawnW: {f: false, i: -1, j: -1},
+    lastLinePawnB: {f: false, i: -1, j: -1}
 }
 
 // Function to switch (toggle) player (color of player in this case)
-const togglePlayer = (player: string): string => (player === 'W' ? 'B' : 'W');
+const togglePlayer = (player: PlayerSide): PlayerSide => (player === PlayerSide.W ? PlayerSide.B : PlayerSide.W);
 
 // Function that swaps figure of two cells of the field
 // It's used for the process of making step by a figure
@@ -45,7 +49,7 @@ const toBeat = (field: Figure[][], i1: number, j1: number, i2: number, j2: numbe
 }
 
 // Root Reducer for Redux
-export const fieldReducer: Reducer<GameState, FieldAction> = (state = initialState, action: FieldAction): GameState => {
+export const rootReducer: Reducer<GameState, CommonAction> = (state = initialState, action: CommonAction): GameState => {
     // Variables for simplification
     // Processing of the action
     switch (action.type) {
@@ -65,7 +69,9 @@ export const fieldReducer: Reducer<GameState, FieldAction> = (state = initialSta
                 timeLeftForW: state.timeLeftForW,
                 timeLeftForB: state.timeLeftForB,
                 madeStepsW: state.madeStepsW,
-                madeStepsB: state.madeStepsB
+                madeStepsB: state.madeStepsB,
+                lastLinePawnW: state.lastLinePawnW,
+                lastLinePawnB: state.lastLinePawnB
             }
         case MAKE_STEP:
             const i = action.payload.i
@@ -78,21 +84,25 @@ export const fieldReducer: Reducer<GameState, FieldAction> = (state = initialSta
                 const x = state.pickedFigureCoords.x
                 const y = state.pickedFigureCoords.y
 
+                let wasBeating
+
                 // If new cell is not empty and there is an enemy on it
                 if (!(state.field[i][j] instanceof Empty)) {
                     // Then this enemy will be beaten by picked figure
+                    wasBeating = true
                     state.field = toBeat(state.field, i, j, x, y)
                 } else {
                     // Otherwise it means that new cell is empty
                     // and it will only take some swapping
+                    wasBeating = false
                     state.field = toSwap(state.field, i, j, x, y)
                 }
 
-                let step: Step = {from: {x, y}, to: {x: i, y: j}, wasBeating: !(state.field[i][j] instanceof Empty)}
+                let step: Step = {from: {x, y}, to: {x: i, y: j}, wasBeating}
                 let timeLeftForW = state.timeLeftForW
                 let timeLeftForB = state.timeLeftForB
 
-                if (state.player === 'B') {
+                if (state.player === PlayerSide.B) {
                     state.madeStepsB.push(step)
                     timeLeftForB += 10
                 } else {
@@ -104,13 +114,13 @@ export const fieldReducer: Reducer<GameState, FieldAction> = (state = initialSta
                 let isKingSafe = JSON.parse(JSON.stringify(state.isKingSafe))
                 let isGameOver = JSON.parse(JSON.stringify(state.isGameOver))
 
-                let winner = ''
+                let winner = PlayerSide.NOTHING
 
                 // Toggle player
                 const nextPlayer = togglePlayer(state.player)
 
                 // Check if next player is under a shah or not
-                if (nextPlayer === 'B') {
+                if (nextPlayer === PlayerSide.B) {
                     isKingSafe.B = checkIfKingIsSafe(state.field, nextPlayer)
                 } else {
                     isKingSafe.W = checkIfKingIsSafe(state.field, nextPlayer)
@@ -123,10 +133,21 @@ export const fieldReducer: Reducer<GameState, FieldAction> = (state = initialSta
                     winner = nextPlayer
                 } else {
                     // Otherwise the threat is gone
-                    if (state.player === 'B') {
+                    if (state.player === PlayerSide.B) {
                         isKingSafe.B = true
                     } else {
                         isKingSafe.W = true
+                    }
+                }
+
+                let isLastLinePawnW = state.lastLinePawnW
+                let isLastLinePawnB = state.lastLinePawnB
+
+                if (state.field[i][j] instanceof Pawn && (i === 0 || i === 7)) {
+                    if (state.player === PlayerSide.B) {
+                        isLastLinePawnB = {f: true, i, j}
+                    } else if (state.player === PlayerSide.W) {
+                        isLastLinePawnW = {f: true, i, j}
                     }
                 }
 
@@ -143,26 +164,52 @@ export const fieldReducer: Reducer<GameState, FieldAction> = (state = initialSta
                     timeLeftForW: timeLeftForW,
                     timeLeftForB: timeLeftForB,
                     madeStepsW: state.madeStepsW,
-                    madeStepsB: state.madeStepsB
+                    madeStepsB: state.madeStepsB,
+                    lastLinePawnW: isLastLinePawnW,
+                    lastLinePawnB: isLastLinePawnB
                 }
             }
             // If making step is impossible, it returns the same state
             return state;
         case TICK:
-            if (action.payload.side === 'W') {
+            if (action.payload.side === PlayerSide.W) {
                 if (state.timeLeftForW <= 0) {
-                    return {...state, timeLeftForW: 0, isGameOver: true, winner: 'B'}
+                    return {...state, timeLeftForW: 0, isGameOver: true, winner: PlayerSide.B}
                 }
                 return {...state, timeLeftForW: state.timeLeftForW - 1}
-            } else if (action.payload.side === 'B') {
+            } else if (action.payload.side === PlayerSide.B) {
                 if (state.timeLeftForB <= 0) {
-                    return {...state, timeLeftForB: 0, isGameOver: true, winner: 'W'}
+                    return {...state, timeLeftForB: 0, isGameOver: true, winner: PlayerSide.W}
                 }
                 return {...state, timeLeftForB: state.timeLeftForB - 1}
             }
             return state;
+        case SURRENDER:
+            if (action.payload.side === PlayerSide.W) {
+                return {...state, isGameOver: true, winner: PlayerSide.B}
+            } else if (action.payload.side === PlayerSide.B) {
+                return {...state, isGameOver: true, winner: PlayerSide.W}
+            }
+            return state
+        case LAST_LINE:
+            state.field[action.payload.i][action.payload.j] = action.payload.figure
+            state.lastLinePawnW = {f: false, i: -1, j: -1}
+            state.lastLinePawnB = {f: false, i: -1, j: -1}
+            return {...state}
         default:
             // In other situations the same state will be returned
             return state
     }
 }
+
+// export const playerInfoReducer: Reducer<GameState, PlayerInfoAction> = (state = initialState, action: PlayerInfoAction): GameState => {
+//     switch (action.type) {
+//         default:
+//             return state
+//     }
+// }
+
+// export const choiceReducer: Reducer<GameState, ChoiceAction> = (state = initialState, action: ChoiceAction): GameState => {
+//     switch (action.type) {
+//     }
+// }

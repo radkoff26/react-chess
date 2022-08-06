@@ -9,79 +9,6 @@
   }
 }
 
-.player_info {
-  display: flex;
-  flex-flow: column nowrap;
-  height: 70vh;
-
-  h1 {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 16px;
-    padding: 8px;
-    border-radius: 16px;
-    text-align: center;
-    flex-grow: 1;
-  }
-
-  h1.white_side {
-    color: #000;
-    background-color: #fff;
-    border: 1px solid #000;
-  }
-
-  h1.black_side {
-    color: #fff;
-    background-color: #000;
-    border: 1px solid #fff;
-  }
-
-  p.side {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 24px;
-    font-weight: bolder;
-  }
-
-  p.countdown {
-    font-size: 24px;
-    flex-grow: 1;
-    margin-bottom: 28px;
-  }
-
-  h2.title {
-    margin-bottom: 8px;
-  }
-
-  ul.history {
-    list-style-type: none;
-    flex-grow: 40;
-    overflow-y: auto;
-    margin-bottom: 24px;
-  }
-
-  button.surrender {
-    padding: 8px 4px;
-    border: 1px solid transparent;
-    outline: none;
-    background-color: rgba(255, 0, 0, 0.82);
-    color: #fff;
-    border-radius: 8px;
-    transition: .5s;
-    cursor: pointer;
-    font-weight: bolder;
-    font-size: 20px;
-
-    &:hover {
-      border-color: rgba(255, 0, 0, 0.82);
-      background-color: transparent;
-      color: rgba(255, 0, 0, 0.82);
-    }
-  }
-}
-
 .field_container {
   position: relative;
 
@@ -178,18 +105,6 @@
       font-size: 24px;
       color: #00ff34;
       top: calc(100% + 24px);
-    }
-
-    .cell {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border: 1px solid rgba(0, 0, 0, 0.5);
-
-      img {
-        height: 70%;
-        width: 70%;
-      }
     }
   }
 }

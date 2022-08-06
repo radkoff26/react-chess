@@ -1,17 +1,20 @@
-import React, {memo, useEffect, useRef, useState} from 'react';
+import React, {memo, useEffect, useRef} from 'react';
 import {Step} from "../models/step";
 import {convertCoordsToFieldCoords, convertSecondsToMinutesAndSeconds} from "../helpers/function_helpers";
-import {FieldAction, tick} from "../store/actions";
+import {PlayerInfoAction} from "../store/actions";
+import {PlayerSide} from "../helpers/enums";
+import '../scss/components/player_info.scss'
 
 export interface PlayerInfoProps {
     playerName: string
-    playerSide: string
+    playerSide: PlayerSide
     timeLeft: number
     madeSteps: Step[]
-    colorOfCurrentPlayer: string
+    sideOfCurrentPlayer: PlayerSide
     isGameOver: boolean
 
-    tick(side: string): FieldAction
+    tick(side: PlayerSide): PlayerInfoAction
+    surrender(side: PlayerSide): PlayerInfoAction
 }
 
 const PlayerInfo = memo((props: PlayerInfoProps) => {
@@ -27,7 +30,7 @@ const PlayerInfo = memo((props: PlayerInfoProps) => {
 
     useEffect(() => {
         if (!props.isGameOver) {
-            if (props.colorOfCurrentPlayer === props.playerSide) {
+            if (props.sideOfCurrentPlayer === props.playerSide) {
                 // @ts-ignore
                 tickTimeout.current = setTimeout(tickSecInterval, 1000)
             } else {
@@ -45,23 +48,23 @@ const PlayerInfo = memo((props: PlayerInfoProps) => {
                 clearTimeout(tickTimeout.current)
             }
         }
-    }, [props.colorOfCurrentPlayer, props.isGameOver])
+    }, [props.sideOfCurrentPlayer, props.isGameOver])
 
     return (
         <div className='player_info'>
-            <h1 className={(props.playerSide === 'W' ? 'white' : 'black') + '_side'}>{props.playerName}</h1>
-            <p className='side'>{props.playerSide === 'W' ? 'White' : 'Black'}</p>
+            <h1 className={(props.playerSide === PlayerSide.W ? 'white' : 'black') + '_side'}>{props.playerName}</h1>
+            <p className='side'>{props.playerSide === PlayerSide.W ? 'White' : 'Black'}</p>
             <p className="countdown">Time left - <b>{convertSecondsToMinutesAndSeconds(props.timeLeft)}</b></p>
             <h2 className='title'>History</h2>
             <ul className="history">
                 {
                     props.madeSteps.map(value => {
                         let newValue = `${convertCoordsToFieldCoords(value.from)} - ${convertCoordsToFieldCoords(value.to)}`
-                        return <li key={newValue}>{newValue}</li>
+                        return <li key={newValue}>{newValue}{value.wasBeating ? ': beat' : ''}</li>
                     })
                 }
             </ul>
-            <button className='surrender'>Surrender</button>
+            <button className='surrender' onClick={() => !props.isGameOver && props.surrender(props.playerSide)}>Surrender</button>
         </div>
     );
 });

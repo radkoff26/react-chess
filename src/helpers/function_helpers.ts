@@ -1,6 +1,7 @@
 import {Figure} from "../models/figures/figure";
 import {Empty} from "../models/figures/empty";
 import {Coords} from "../logic/logic_functions";
+import {PlayerSide} from "./enums";
 
 // Function that provides checking of bounds
 export function checkBounds(...indices: number[]): boolean {
@@ -18,13 +19,13 @@ export function checkBoundsAndEmptiness(field: Figure[][], x: number, y: number)
 }
 
 // Function that provides checking of bounds and checks if on the particular cell there is an enemy
-export function checkBoundsAndEnemy(field: Figure[][], x: number, y: number, color: string): boolean {
-    return checkBounds(x, y) && color !== field[x][y].color && !(field[x][y] instanceof Empty);
+export function checkBoundsAndEnemy(field: Figure[][], x: number, y: number, color: PlayerSide): boolean {
+    return checkBounds(x, y) && color !== field[x][y].side && !(field[x][y] instanceof Empty);
 }
 
 // Function that provides checking of bounds and checks if on the particular cell there is no figure or there is an enemy
-export function checkBoundsAndEmptinessAndEnemy(field: Figure[][], x: number, y: number, color: string): boolean {
-    return checkBounds(x, y) && (color !== field[x][y].color || field[x][y] instanceof Empty);
+export function checkBoundsAndEmptinessAndEnemy(field: Figure[][], x: number, y: number, color: PlayerSide): boolean {
+    return checkBounds(x, y) && (color !== field[x][y].side || field[x][y] instanceof Empty);
 }
 
 // Function that checks if there is given coords included in the array

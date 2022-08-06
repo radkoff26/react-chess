@@ -1,0 +1,11 @@
+.cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+
+  img {
+    height: 70%;
+    width: 70%;
+  }
+}

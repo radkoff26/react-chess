@@ -2,37 +2,53 @@ import React from 'react';
 import Cell from "./Cell";
 import {Figure} from "../models/figures/figure";
 import {SIGNATURES_TO_OBJECTS} from "../models/definitions";
-import '../scss/field.scss'
+import '../scss/components/field.scss'
 import {Coords} from "../logic/logic_functions";
 import {includes} from "../helpers/function_helpers";
 import {connect, ConnectedProps} from "react-redux";
 import {Dispatch} from "redux";
-import {chooseFigure, FieldAction, makeStep, PlayerInfoAction, tick} from "../store/actions";
+import {
+    CellAction,
+    ChoiceAction,
+    ChoicePayload,
+    chooseFigure,
+    lastLine,
+    makeStep,
+    PlayerInfoAction,
+    surrender,
+    tick
+} from "../store/actions";
 import PlayerInfo from "./PlayerInfo";
 import {Step} from "../models/step";
+import {PlayerSide} from "../helpers/enums";
+import Choices from "./Choices";
 
 // Game State
 export interface GameState {
     field: Figure[][]
     steps: Coords[]
     pickedFigureCoords: Coords
-    player: string
+    player: PlayerSide
     isKingSafe: { W: boolean, B: boolean }
     isGameOver: boolean
     playersInGame: { W: string, B: string }
-    winner: string
+    winner: PlayerSide
     timeLeftForW: number
     timeLeftForB: number
     madeStepsW: Step[]
     madeStepsB: Step[]
+    lastLinePawnW: { f: boolean, i: number, j: number }
+    lastLinePawnB: { f: boolean, i: number, j: number }
 }
 
 // Mappers for Redux connect
 const mapState = (state: GameState): GameState => (state)
 const mapDispatch = (dispatch: Dispatch) => ({
-    chooseFigure: (i: number, j: number): FieldAction => dispatch(chooseFigure(i, j)),
-    makeStep: (i: number, j: number): FieldAction => dispatch(makeStep(i, j)),
-    tick: (side: string): FieldAction => dispatch(tick(side))
+    chooseFigure: (i: number, j: number): CellAction => dispatch(chooseFigure(i, j)),
+    makeStep: (i: number, j: number): CellAction => dispatch(makeStep(i, j)),
+    tick: (side: PlayerSide): PlayerInfoAction => dispatch(tick(side)),
+    surrender: (side: PlayerSide): PlayerInfoAction => dispatch(surrender(side)),
+    lastLine: (payload: ChoicePayload): ChoiceAction => dispatch(lastLine(payload))
 })
 
 // Redux connection
@@ -43,16 +59,26 @@ const letterArray = 'ABCDEFGH'.split('')
 const digitArray = '12345678'.split('')
 
 const Field = (props: FieldProps) => {
+    let a: Figure = JSON.parse(JSON.stringify(props.field[0][0]))
     return (
         <>
+            {(props.lastLinePawnW.f || props.lastLinePawnB.f) &&
+            <Choices
+                playerSide={props.lastLinePawnW.f ? PlayerSide.W : PlayerSide.B}
+                playerName={props.lastLinePawnW.f ? props.playersInGame.W : props.playersInGame.B}
+                i={props.lastLinePawnW.f ? props.lastLinePawnW.i : props.lastLinePawnB.i}
+                j={props.lastLinePawnW.f ? props.lastLinePawnW.j : props.lastLinePawnB.j}
+                lastLine={props.lastLine}
+            />}
             <PlayerInfo
-                playerSide='W'
+                playerSide={PlayerSide.W}
                 playerName={props.playersInGame.W}
                 madeSteps={props.madeStepsW}
                 timeLeft={props.timeLeftForW}
-                colorOfCurrentPlayer={props.player}
+                sideOfCurrentPlayer={props.player}
                 tick={props.tick}
                 isGameOver={props.isGameOver}
+                surrender={props.surrender}
             />
             <div className='field_container'>
                 <div className='field'>
@@ -78,11 +104,11 @@ const Field = (props: FieldProps) => {
                     </div>
 
                     {props.isGameOver &&
-                    <h1 className='game_over'>Сheckmate! {props.winner === 'W' ? 'White side' : 'Black side'} has
+                    <h1 className='game_over'>Сheckmate! {props.winner === PlayerSide.W ? 'White side' : 'Black side'} has
                         won!</h1>}
 
                     {!props.isGameOver &&
-                    <h1 className='step'>{props.player === 'W' ? 'White side' : 'Black side'} steps now!</h1>}
+                    <h1 className='step'>{props.player === PlayerSide.W ? 'White side' : 'Black side'} steps now!</h1>}
 
                     {!props.isGameOver && (!props.isKingSafe.B || !props.isKingSafe.W) &&
                     <h1 className='shah'>Shah for {!props.isKingSafe.W ? 'White side' : 'Black side'} King!</h1>}
@@ -117,13 +143,14 @@ const Field = (props: FieldProps) => {
                 </div>
             </div>
             <PlayerInfo
-                playerSide='B'
+                playerSide={PlayerSide.B}
                 playerName={props.playersInGame.B}
                 madeSteps={props.madeStepsB}
                 timeLeft={props.timeLeftForB}
-                colorOfCurrentPlayer={props.player}
+                sideOfCurrentPlayer={props.player}
                 tick={props.tick}
                 isGameOver={props.isGameOver}
+                surrender={props.surrender}
             />
         </>
     );

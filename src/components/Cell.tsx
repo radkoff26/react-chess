@@ -1,6 +1,8 @@
 import React, {memo} from 'react';
 import {Figure} from "../models/figures/figure";
-import {FieldAction} from "../store/actions";
+import {CellAction} from "../store/actions";
+import {PlayerSide} from "../helpers/enums";
+import '../scss/components/cell.scss'
 
 // Cell Props
 export interface CellProps {
@@ -10,12 +12,12 @@ export interface CellProps {
     isPossibleToStep: boolean
     i: number
     j: number
-    playerSignature: string
+    playerSignature: PlayerSide
     isGameOver: boolean
 
-    chooseFigure(i: number, j: number): FieldAction
+    chooseFigure(i: number, j: number): CellAction
 
-    makeStep(i: number, j: number): FieldAction
+    makeStep(i: number, j: number): CellAction
 }
 
 const Cell = memo((props: CellProps) => {
@@ -30,7 +32,7 @@ const Cell = memo((props: CellProps) => {
 
     // Function that is invoked when user intends to choose figure
     const clickToChoose = () => {
-        if (!props.isPossibleToStep && props.figure.color === props.playerSignature) {
+        if (!props.isPossibleToStep && props.figure.side === props.playerSignature) {
             props.chooseFigure(props.i, props.j)
         }
     }

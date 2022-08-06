@@ -1,11 +1,12 @@
 import {Figure} from "./figure";
+import {PlayerSide} from "../../helpers/enums";
 
 export class Knight implements Figure {
-    color: string;
+    side: PlayerSide;
     signature: string;
 
-    constructor(color: string) {
-        this.color = color;
-        this.signature = color + 'KN';
+    constructor(side: PlayerSide) {
+        this.side = side;
+        this.signature = side + 'KN';
     }
 }

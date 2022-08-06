@@ -1,4 +1,6 @@
+import {PlayerSide} from "../../helpers/enums";
+
 export interface Figure {
     signature: string
-    color: string
+    side: PlayerSide
 }

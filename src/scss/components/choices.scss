@@ -1,0 +1,44 @@
+.choices {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, .7);
+
+  z-index: 20;
+
+  h1, h2 {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 16px;
+    color: #ffffff;
+  }
+
+  .choices_container {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    width: 50%;
+
+    img:nth-child(odd) {
+      background-color: #fff;
+    }
+
+    img:nth-child(even) {
+      background-color: #713b00;
+    }
+
+    img {
+      height: auto;
+      width: 12%;
+      cursor: pointer;
+    }
+  }
+}

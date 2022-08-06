@@ -19,53 +19,58 @@ import whiteQueen from '../assets/white_queen.svg'
 import blackKing from '../assets/black_king.svg'
 import whiteKing from '../assets/white_king.svg'
 
+import {PlayerSide} from '../helpers/enums'
+
+const W = PlayerSide.W
+const B = PlayerSide.B
+
 export const SIGNATURES_TO_OBJECTS = {
     'BP': {
-        callback: () => new Pawn('B'),
+        callback: () => new Pawn(B),
         url: blackPawn
     },
     'WP': {
-        callback: () => new Pawn('W'),
+        callback: () => new Pawn(W),
         url: whitePawn
     },
     'BR': {
-        callback: () => new Rook('B'),
+        callback: () => new Rook(B),
         url: blackRook
     },
     'WR': {
-        callback: () => new Rook('W'),
+        callback: () => new Rook(W),
         url: whiteRook
     },
     'BKN': {
-        callback: () => new Knight('B'),
+        callback: () => new Knight(B),
         url: blackKnight
     },
     'WKN': {
-        callback: () => new Knight('W'),
+        callback: () => new Knight(W),
         url: whiteKnight
     },
     'BB': {
-        callback: () => new Bishop('B'),
+        callback: () => new Bishop(B),
         url: blackBishop
     },
     'WB': {
-        callback: () => new Bishop('W'),
+        callback: () => new Bishop(W),
         url: whiteBishop
     },
     'BQ': {
-        callback: () => new Queen('B'),
+        callback: () => new Queen(B),
         url: blackQueen
     },
     'WQ': {
-        callback: () => new Queen('W'),
+        callback: () => new Queen(W),
         url: whiteQueen
     },
     'BK': {
-        callback: () => new King('B'),
+        callback: () => new King(B),
         url: blackKing
     },
     'WK': {
-        callback: () => new King('W'),
+        callback: () => new King(W),
         url: whiteKing
     },
     '': {
