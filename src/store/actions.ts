@@ -1,16 +1,17 @@
 import {AnyAction} from "redux";
 import {
-    CHOOSE_FIGURE,
+    CHOOSE_FIGURE, GAME_ADJUSTMENT,
     LAST_LINE,
     MAKE_STEP,
     SURRENDER,
     TICK,
-    TYPE_CHOOSE_FIGURE, TYPE_LAST_LINE,
+    TYPE_CHOOSE_FIGURE, TYPE_GAME_ADJUSTMENT, TYPE_LAST_LINE,
     TYPE_MAKE_STEP, TYPE_SURRENDER,
     TYPE_TICK
 } from "./types";
 import {PlayerSide} from "../helpers/enums";
 import {Figure} from "../models/figures/figure";
+import {GameData} from "../App";
 
 // Payload for CellAction
 export interface CellPayload {
@@ -49,7 +50,13 @@ export interface ChoiceAction extends AnyAction {
     payload: ChoicePayload
 }
 
-export type CommonAction = CellAction | PlayerInfoAction | ChoiceAction
+// Game Adjustment action for Redux
+export interface GameAdjustmentAction extends AnyAction {
+    type: TYPE_GAME_ADJUSTMENT
+    payload: GameData
+}
+
+export type CommonAction = CellAction | PlayerInfoAction | ChoiceAction | GameAdjustmentAction
 
 // Functions that return actions by given parameters
 export const chooseFigure = (i: number, j: number): CellAction => ({type: CHOOSE_FIGURE, payload: {i, j}})
@@ -57,3 +64,4 @@ export const makeStep = (i: number, j: number): CellAction => ({type: MAKE_STEP,
 export const tick = (side: PlayerSide): PlayerInfoAction => ({type: TICK, payload: {side}})
 export const surrender = (side: PlayerSide): PlayerInfoAction => ({type: SURRENDER, payload: {side}})
 export const lastLine = (payload: ChoicePayload): ChoiceAction => ({type: LAST_LINE, payload})
+export const adjustGame = (payload: GameData): GameAdjustmentAction => ({type: GAME_ADJUSTMENT, payload})

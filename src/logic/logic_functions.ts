@@ -13,6 +13,7 @@ import {
 import {Bishop} from "../models/figures/bishop";
 import {Queen} from "../models/figures/queen";
 import {King} from "../models/figures/king";
+import {HasStep} from "../models/figures/has_step";
 
 // Interface to store coordinates of some cell
 export interface Coords {
@@ -24,8 +25,43 @@ export function findDirection(color: PlayerSide): Direction {
     return color === PlayerSide.W ? Direction.DOWN : Direction.UP;
 }
 
+function getCastlingIfPossible(field: Figure[][], i: number, j: number): Coords[] {
+    if (!(field[i][j] instanceof King) && !(field[i][j] as unknown as HasStep).hasStepped) {
+        return [] as Coords[]
+    }
+
+    const side: PlayerSide = field[i][j].side
+    const rooksCoords: Coords[] = []
+    const possibleCastling: Coords[] = []
+
+    for (let k = 0; k < 8; k++) {
+        for (let l = 0; l < 8; l++) {
+            if (field[k][l] instanceof Rook && field[k][l].side === side) {
+                rooksCoords.push({x: k, y: l})
+            }
+        }
+    }
+
+    for (let rookCoords of rooksCoords) {
+        if (!(field[rookCoords.x][rookCoords.y] as unknown as HasStep).hasStepped) {
+            let start = Math.min(rookCoords.y, j)
+            let end = Math.max(rookCoords.y, j)
+            for (let k = start + 1; k < end; k++) {
+                if (!(field[i][k] instanceof Empty)) {
+                    break
+                }
+                if (k === end - 1) {
+                    possibleCastling.push(rookCoords)
+                }
+            }
+        }
+    }
+
+    return possibleCastling
+}
+
 // Function to calculate possible steps for Rook
-function calculateRook(field: Figure[][], i: number, j: number, steps: Coords[]) {
+function calculateRook(field: Figure[][], i: number, j: number, steps: Coords[]): void {
     // Vertical down check
     for (let k = i + 1; k < 8; k++) {
         if (!(field[k][j] instanceof Empty)) {
@@ -72,7 +108,7 @@ function calculateRook(field: Figure[][], i: number, j: number, steps: Coords[])
 }
 
 // Function to calculate steps for Bishop
-function calculateBishop(field: Figure[][], i: number, j: number, steps: Coords[]) {
+function calculateBishop(field: Figure[][], i: number, j: number, steps: Coords[]): void {
     // Diagonal to right bottom
     for (let k = i + 1, l = j + 1; k < 8 && l < 8; k++, l++) {
         if (!(field[k][l] instanceof Empty)) {
@@ -263,6 +299,8 @@ export function calculateSteps(field: Figure[][], i: number, j: number, directio
         if (checkBoundsAndEmptinessAndEnemy(field, i - 1, j, figure.side)) {
             steps.push({x: i - 1, y: j})
         }
+
+        steps.push(...getCastlingIfPossible(field, i, j))
     }
     return steps;
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext, useLayoutEffect} from 'react';
 import Cell from "./Cell";
 import {Figure} from "../models/figures/figure";
 import {SIGNATURES_TO_OBJECTS} from "../models/definitions";
@@ -8,10 +8,11 @@ import {includes} from "../helpers/function_helpers";
 import {connect, ConnectedProps} from "react-redux";
 import {Dispatch} from "redux";
 import {
+    adjustGame,
     CellAction,
     ChoiceAction,
     ChoicePayload,
-    chooseFigure,
+    chooseFigure, GameAdjustmentAction,
     lastLine,
     makeStep,
     PlayerInfoAction,
@@ -22,6 +23,8 @@ import PlayerInfo from "./PlayerInfo";
 import {Step} from "../models/step";
 import {PlayerSide} from "../helpers/enums";
 import Choices from "./Choices";
+import {GameData} from "../App";
+import {GameContext} from "../pages/GamePage";
 
 // Game State
 export interface GameState {
@@ -48,7 +51,8 @@ const mapDispatch = (dispatch: Dispatch) => ({
     makeStep: (i: number, j: number): CellAction => dispatch(makeStep(i, j)),
     tick: (side: PlayerSide): PlayerInfoAction => dispatch(tick(side)),
     surrender: (side: PlayerSide): PlayerInfoAction => dispatch(surrender(side)),
-    lastLine: (payload: ChoicePayload): ChoiceAction => dispatch(lastLine(payload))
+    lastLine: (payload: ChoicePayload): ChoiceAction => dispatch(lastLine(payload)),
+    adjustGame: (payload: GameData): GameAdjustmentAction => dispatch(adjustGame(payload)),
 })
 
 // Redux connection
@@ -59,7 +63,13 @@ const letterArray = 'ABCDEFGH'.split('')
 const digitArray = '12345678'.split('')
 
 const Field = (props: FieldProps) => {
-    let a: Figure = JSON.parse(JSON.stringify(props.field[0][0]))
+    const gameData = useContext(GameContext)
+
+    useLayoutEffect(() => {
+        console.log("GAME DATA: ", gameData)
+        props.adjustGame(gameData)
+    }, [])
+
     return (
         <>
             {(props.lastLinePawnW.f || props.lastLinePawnB.f) &&
@@ -156,5 +166,8 @@ const Field = (props: FieldProps) => {
     );
 };
 
+
 // Final ConnectedField component
-export const ConnectedField = connector(Field);
+const ConnectedField = connector(Field);
+
+export default ConnectedField

@@ -1,15 +1,15 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: sans-serif;
-}
+a.play {
+  padding: 12px 16px;
+  border: 1px solid #713b00;
+  border-radius: 20px;
+  background-color: #713b00;
+  color: #fff;
+  font-size: 24px;
+  transition: .5s;
+  font-weight: 600;
 
-#root {
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-  justify-content: space-around;
-  align-items: center;
-  position: relative;
+  &:hover {
+    color: #713b00;
+    background-color: #fff;
+  }
 }

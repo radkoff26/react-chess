@@ -54,3 +54,24 @@ export function convertSecondsToMinutesAndSeconds(secondsOverall: number): strin
 export function convertCoordsToFieldCoords(coords: Coords): string {
     return ('ABCDEFGH'.charAt(coords.y)).toString() + '' + (coords.x + 1).toString()
 }
+
+export function copyArray<T>(array: T[]): T[] {
+    let newArray: T[] = []
+    for (let i = 0; i < array.length; i++) {
+        newArray.push(array[i])
+    }
+    return newArray
+}
+
+export function copyDoubleArray<T>(array: T[][]): T[][] {
+    let newArray: T[][] = []
+    let i: number = 0
+    for (let j = 0; j < array.length; j++) {
+        newArray.push([])
+        for (let k = 0; k < array.length; k++) {
+            newArray[i].push(array[j][k])
+        }
+        i++
+    }
+    return newArray
+}
